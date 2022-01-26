@@ -1,76 +1,116 @@
 const express = require('express');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
 
-const notes = require( './db/db.json') //Check if this is the correct path
-// Make sure this file has an array format of json data. [{ "title" : "test title"}]
+let notes = require( './db/db.json')
+let allNotes = "";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use( express.static("public") );
-
 // Middleware for parsing application/json and urlencoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use( express.static("public") );
 
 
 
 
 //////////////////////
 
-app.get('/notes', (req, res)=> {
 
-    //send the file notes.html. 
-    // SEE PREVIOUS CLASS NOTES FOR THIS SET UP. 
-    res.sendFile( path.join(__dirname, 'public/notes.html') );
+app.get('/notes', (req, res)=> 
 
-});
+    res.sendFile( path.join(__dirname, './public/notes.html') )
+
+);
+
 
 app.get('/api/notes', (req, res) => {
 
-    // send the file http://localhost:3001/api/notes
-    // sending json data /*send note data*/
+    
+    console.info(`${req.method} request received to add a note`);
 
-    res.json( /* send note data */);
+    res.json(notes)
+    
+
 });
+
+app.get('*', (req, res) =>
+  res.sendFile(path.join(__dirname, '/public/index.html'))
+);
+
 
 app.post('/api/notes', (req, res) => {
 
-    // Access th note data that as sent
+    console.info(`${req.method} request received to add a review`);
+ 
+    const { title, text } = req.body;
 
-    const newNote = req.body
-
-    // NEED TO ADD ON TO NEWNOTE IF DELETE FUNCTION IS INCLUDED
-    // ADD NOTEDATA TO EXISTING ARRAY LIST
-
-
-    // Create (persist) data
-    // Access the new note data from 'req'
-    // Push it to my existing list of notes
-    // Stringify array list of data and write it. See highscores list from code quiz.
-    // Write my updated note list to the d`db.json`
+    if (title && text ) {
+        // Variable for the object we will save
+        const newNote = {
+          title,
+          text,
+          note_id: uuidv4(),
+        };
 
 
-    // Test. On console, look at Response tab in Network.
-        res.json( 'a message' )
 
-});
+    // Read existing notes
+        // fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        //     if (err) {
+        //     console.error(err);
+        //     } else {
 
+    // Pushes new notes onto notes stored.
+        // notes.push(newNote);
+
+        // allNotes = JSON.parse(notes);    
+        // allNotes.push(newNote);
+
+        
+        // notes.push(newNote);
+        // const allNotes = JSON.parse(data);
+
+        // Add a new review
+
+        notes.push(newNote); 
+        allNotes = JSON.stringify(notes, null, 4)
+
+        
+       
+
+        fs.writeFile(
+            './db/db.json', allNotes, 
+            (writeErr) =>
+              writeErr
+                ? console.error(writeErr)
+                : console.info('Successfully updated notes!')
+          );
+    //     }
+    // });
+       
+        const response = {
+            status: 'success',
+            body: newNote,
+          };
+      
+          console.log(response);
+          res.status(201).json(response);
+        } else {
+          res.status(500).json('Error in posting review');
+        }
+
+    }
+
+);
 
 
 app.listen(PORT, () =>
     console.log(`Example app listening http://localhost:${PORT}`)
 
-)
-
-// SEE ACTIVITY 20 FROM DAY 2. MAY HAVE EVERYTHING.
-// NEED TO SET UP VARIOUS ROUTES
-// USE INSOMNIA TO SEE POST AND GET REQUEST. SEE PAYLOAD TAB IN NETWORK TAB.
-// IN INSOMNIA, MAKE SURE EVERYTHING IS WRAPPED IN QUOTES
-// INSOMNIA > POST > SELECT JSON. 
-
-// LOOK AT SAT CLASS EXAMPLE. THEY READ THE FILE BEFORE WRITING IT. MORE EFFICIENT THAN REQUIRING THE FILE AT THE BEGINNING. KEEPING THE REQUIRE AT THE TOP JUST MEANS THAT THE DATA WILL ALWAYS BE THERE. WITH READ FILE, THE FILE WILL BE READ WHEN WE NEED IT TO. MEMORY EFFICIENT.
-
-// MAKE SURE GITIGNORE NODE_MODULES. HEROKU WILL NOT READ IT.
-
+);
 
