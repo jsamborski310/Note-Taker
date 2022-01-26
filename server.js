@@ -4,7 +4,6 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
 let notes = require( './db/db.json');
-const { parse } = require('path');
 let allNotes = "";
 
 const app = express();
@@ -94,28 +93,16 @@ app.delete('/api/notes/:id', (req, res) => {
     const noteIndex = notes.findIndex(({id}) => id === req.params.id);
 
     if (noteIndex >= 0) {
-
-        // const updatedNotes = notes.splice(noteIndex, 1)
-        // const parseUpdatedNotes = JSON.parse(updatedNotes)
-
         notes.splice(noteIndex, 1)
 
-        // const updatedNotes = JSON.stringify(notes, null)
-
-        // fs.writeFile(
-        //     './db/db.json', updatedNotes, // notes or allNotes
-        //     (writeErr) =>
-        //       writeErr
-        //         ? console.error(writeErr)
-        //         : console.info('Successfully deleted notes with ID:' + req.params.id)
-        //   );
+        // var updatedNotes = JSON.parse(notes)
 
           fs.writeFile(
             './db/db.json', JSON.stringify(notes, null, 4), // notes or allNotes
             (writeErr) =>
               writeErr
                 ? console.error(writeErr)
-                : console.info('Successfully deleted notes with ID:' + req.params.id)
+                : console.info('Successfully deleted note with ID:' + req.params.id)
           );
 
         
@@ -135,3 +122,21 @@ app.listen(PORT, () =>
 
 );
 
+
+// What is the number 4 for? 
+// Why does it remove from the database but not the html?
+
+
+
+        // const updatedNotes = notes.splice(noteIndex, 1)
+        // const parseUpdatedNotes = JSON.parse(updatedNotes)
+
+        // const updatedNotes = JSON.stringify(notes, null)
+
+        // fs.writeFile(
+        //     './db/db.json', updatedNotes, // notes or allNotes
+        //     (writeErr) =>
+        //       writeErr
+        //         ? console.error(writeErr)
+        //         : console.info('Successfully deleted notes with ID:' + req.params.id)
+        //   );
