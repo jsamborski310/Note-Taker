@@ -21,6 +21,7 @@ app.use( express.static("public") );
 //////////////////////
 
 
+
 app.get('/notes', (req, res)=> 
 
     res.sendFile( path.join(__dirname, './public/notes.html') )
@@ -50,38 +51,17 @@ app.post('/api/notes', (req, res) => {
     const { title, text } = req.body;
 
     if (title && text ) {
-        // Variable for the object we will save
+
+     // Variable for the object being saved
         const newNote = {
           title,
           text,
           note_id: uuidv4(),
         };
 
-
-
-    // Read existing notes
-        // fs.readFile('./db/db.json', 'utf8', (err, data) => {
-        //     if (err) {
-        //     console.error(err);
-        //     } else {
-
-    // Pushes new notes onto notes stored.
-        // notes.push(newNote);
-
-        // allNotes = JSON.parse(notes);    
-        // allNotes.push(newNote);
-
-        
-        // notes.push(newNote);
-        // const allNotes = JSON.parse(data);
-
-        // Add a new review
-
         notes.push(newNote); 
         allNotes = JSON.stringify(notes, null, 4)
 
-        
-       
 
         fs.writeFile(
             './db/db.json', allNotes, 
@@ -90,8 +70,7 @@ app.post('/api/notes', (req, res) => {
                 ? console.error(writeErr)
                 : console.info('Successfully updated notes!')
           );
-    //     }
-    // });
+   
        
         const response = {
             status: 'success',
