@@ -3,7 +3,8 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
-let notes = require( './db/db.json')
+let notes = require( './db/db.json');
+const { parse } = require('path');
 let allNotes = "";
 
 const app = express();
@@ -35,9 +36,7 @@ app.get('/api/notes', (req, res) =>
     
 );
 
-app.get('*', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html'))
-);
+
 
 
 app.post('/api/notes', (req, res) => {
@@ -81,6 +80,53 @@ app.post('/api/notes', (req, res) => {
 
     }
 
+);
+
+app.get('/api/notes/:id', (req, res) => 
+
+    res.json(req.params.id)
+    
+);
+
+app.delete('/api/notes/:id', (req, res) => {
+
+
+    const noteIndex = notes.findIndex(({id}) => id === req.params.id);
+
+    if (noteIndex >= 0) {
+
+        // const updatedNotes = notes.splice(noteIndex, 1)
+        // const parseUpdatedNotes = JSON.parse(updatedNotes)
+
+        notes.splice(noteIndex, 1)
+
+        // const updatedNotes = JSON.stringify(notes, null)
+
+        // fs.writeFile(
+        //     './db/db.json', updatedNotes, // notes or allNotes
+        //     (writeErr) =>
+        //       writeErr
+        //         ? console.error(writeErr)
+        //         : console.info('Successfully deleted notes with ID:' + req.params.id)
+        //   );
+
+          fs.writeFile(
+            './db/db.json', JSON.stringify(notes, null, 4), // notes or allNotes
+            (writeErr) =>
+              writeErr
+                ? console.error(writeErr)
+                : console.info('Successfully deleted notes with ID:' + req.params.id)
+          );
+
+        
+    }
+
+});
+
+
+
+app.get('*', (req, res) =>
+  res.sendFile(path.join(__dirname, '/public/index.html'))
 );
 
 
