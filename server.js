@@ -104,8 +104,7 @@ app.delete('/api/notes/:id', (req, res) => {
                 ? console.error(writeErr)
                 : console.info('Successfully deleted note with ID:' + req.params.id)
           );
-
-        
+          res.sendStatus(204)
     }
 
 });
