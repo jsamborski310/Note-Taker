@@ -1,9 +1,14 @@
+
+// Packages needed for this application.
 const express = require('express');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
+// Pulls in database data
 let notes = require( './db/db.json');
+
+// Receives data
 let allNotes = "";
 
 const app = express();
@@ -15,27 +20,18 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use( express.static("public") );
 
-
-
-
 //////////////////////
 
 
 
 app.get('/notes', (req, res)=> 
-
     res.sendFile( path.join(__dirname, './public/notes.html') )
-
 );
 
-
+// Grabs database data to display
 app.get('/api/notes', (req, res) => 
-
     res.json(notes)
-    
 );
-
-
 
 
 app.post('/api/notes', (req, res) => {
@@ -53,9 +49,10 @@ app.post('/api/notes', (req, res) => {
           id: uuidv4(),
         };
 
+        // Adds new note to array of saved notes
         notes.push(newNote); 
-        allNotes = JSON.stringify(notes, null, 4)
 
+        allNotes = JSON.stringify(notes, null, 4)
 
         fs.writeFile(
             './db/db.json', allNotes, 
@@ -82,33 +79,33 @@ app.post('/api/notes', (req, res) => {
 );
 
 app.get('/api/notes/:id', (req, res) => 
-
     res.json(req.params.id)
-    
 );
 
+// Deletes notes and removes it from database and HTML
 app.delete('/api/notes/:id', (req, res) => {
 
-
+    // Searches through notes to find matching ID
     const noteIndex = notes.findIndex(({id}) => id === req.params.id);
 
+    // Deletes note with matching ID
     if (noteIndex >= 0) {
         notes.splice(noteIndex, 1)
 
-        // var updatedNotes = JSON.parse(notes)
-
+        // Re-writes file, after removing deleted note.
           fs.writeFile(
-            './db/db.json', JSON.stringify(notes, null, 4), // notes or allNotes
+            './db/db.json', JSON.stringify(notes, null, 4), 
             (writeErr) =>
               writeErr
                 ? console.error(writeErr)
                 : console.info('Successfully deleted note with ID:' + req.params.id)
           );
+
+        //   Route fired when delete button clicked is valid, and responds with the above logic.
           res.sendStatus(204)
     }
 
 });
-
 
 
 app.get('*', (req, res) =>
@@ -121,21 +118,3 @@ app.listen(PORT, () =>
 
 );
 
-
-// What is the number 4 for? 
-// Why does it remove from the database but not the html?
-
-
-
-        // const updatedNotes = notes.splice(noteIndex, 1)
-        // const parseUpdatedNotes = JSON.parse(updatedNotes)
-
-        // const updatedNotes = JSON.stringify(notes, null)
-
-        // fs.writeFile(
-        //     './db/db.json', updatedNotes, // notes or allNotes
-        //     (writeErr) =>
-        //       writeErr
-        //         ? console.error(writeErr)
-        //         : console.info('Successfully deleted notes with ID:' + req.params.id)
-        //   );
